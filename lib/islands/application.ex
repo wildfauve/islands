@@ -6,8 +6,11 @@ defmodule Islands.Application do
   use Application
 
   def start(_type, _args) do
+    :ets.new(:game_state, [:public, :named_table])
     # List all child processes to be supervised
     children = [
+      {Registry, keys: :unique, name: Registry.Game},
+      Islands.GameSupervisor
       # Starts a worker by calling: Islands.Worker.start_link(arg)
       # {Islands.Worker, arg},
     ]

@@ -20,6 +20,24 @@ defmodule Islands.Island do
     Enum.reduce_while(offsets, MapSet.new(), fn offset, acc -> add_coordinate(acc, upper_left, offset) end)
   end
 
+  def guess(island, guess) do
+    case MapSet.member?(island.coordinates, guess) do
+      true -> hit_coordinates = MapSet.put(island.hit_coordinates, guess)
+              {:hit, %{island | hit_coordinates: hit_coordinates} }
+      false -> :miss
+    end
+  end
+
+  def forested?(island) do
+    MapSet.equal?(island.coordinates, island.hit_coordinates)
+  end
+
+  def overlap?(existing_island, new_island) do
+    not MapSet.disjoint?(existing_island.coordinates, new_island.coordinates)
+  end
+
+  def types(), do: [:atoll, :square, :dot, :l_shape, :s_shape]
+
   defp add_coordinate(coordinates, %Coordinate{row: row, col: col}, {row_offset, col_offset}) do
     case Coordinate.new(row + row_offset, col + col_offset) do
       {:ok, coordinate}               -> {:cont, MapSet.put(coordinates, coordinate)}
@@ -32,6 +50,6 @@ defmodule Islands.Island do
   defp offsets(:dot), do: [{0,0}]
   defp offsets(:l_shape), do: [{0,0}, {1,0}, {2,0}, {2,1}]
   defp offsets(:s_shape), do: [{0,1}, {0,2}, {1,0}, {1,1}]
-  defp offsets(_), do: {:error, :invalid_island}
+  defp offsets(_), do: {:error, :invalid_island_type}
 
 end
