@@ -1,32 +1,34 @@
 defmodule Islands.Game do
 
-"""
-alias Islands.{Game, Rules}
-via = Game.via_tuple("Col")
+  @moduledoc """
+  alias Islands.{Game, Rules}
 
-{:ok, g} = Game.start_link("Col", name: via)
+  via = Game.via_tuple("Col")
 
-Game.add_player(g, "Bronzie")
+  {:ok, g} = Game.start_link("Col")
 
-Game.position_island(g, :player1, :atoll,1,1)
-Game.position_island(g, :player1, :dot,1,4)
-Game.position_island(g, :player1, :l_shape,1,5)
-Game.position_island(g, :player1, :s_shape,5,1)
-Game.position_island(g, :player1, :square,5,5)
-Game.position_island(g, :player2, :atoll,1,1)
-Game.position_island(g, :player2, :dot,1,4)
-Game.position_island(g, :player2, :l_shape,1,5)
-Game.position_island(g, :player2, :s_shape,5,1)
-Game.position_island(g, :player2, :square,5,5)
+  Game.add_player(g, "Bronzie")
 
-s = :sys.get_state(g)
-s = :sys.replace_state(g, fn s -> %{s | rules: %Rules{state: :player1_turn}} end)
+  Game.position_island(g, :player1, :atoll,1,1)
+  Game.position_island(g, :player1, :dot,1,4)
+  Game.position_island(g, :player1, :l_shape,1,5)
+  Game.position_island(g, :player1, :s_shape,5,1)
+  Game.position_island(g, :player1, :square,5,5)
+  Game.position_island(g, :player2, :atoll,1,1)
+  Game.position_island(g, :player2, :dot,1,4)
+  Game.position_island(g, :player2, :l_shape,1,5)
+  Game.position_island(g, :player2, :s_shape,5,1)
+  Game.position_island(g, :player2, :square,5,5)
 
-Game.set_islands(g, :player1)
-Game.set_islands(g, :player2)
+  s = :sys.get_state(g)
+  s = :sys.replace_state(g, fn s -> %{s | rules: %Rules{state: :player1_turn}} end)
 
-Game.guess_coordinate(g, :player1, 1,1)
-"""
+  Game.set_islands(g, :player1)
+  Game.set_islands(g, :player2)
+
+  Game.guess_coordinate(g, :player1, 1,1)
+
+  """
   use GenServer, start: {__MODULE__, :start_link, []}, restart: :transient
 
   alias Islands.{Island, Board, Coordinate, Guesses, Rules}
@@ -108,7 +110,6 @@ Game.guess_coordinate(g, :player1, 1,1)
   end
 
   def handle_call({:guess_coordinate, player, row, col}, _from, state) do
-    board = player_board(state, player)
     opponent_board = player_board(state, opponent(player))
     with {:ok, rules}        <- Rules.check(state.rules, {:guess_coordinate, player}),
          {:ok, coordinate}   <- Coordinate.new(row, col),
@@ -133,7 +134,7 @@ Game.guess_coordinate(g, :player1, 1,1)
     state =
       case :ets.lookup(:game_state, name) do
         []             -> empty_game_state(name)
-        [{key, state}] -> state
+        [{_key, state}] -> state
       end
     :ets.insert(:game_state, {name, state})
     {:noreply, state, @timeout}

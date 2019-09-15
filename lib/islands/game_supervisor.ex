@@ -1,6 +1,6 @@
 defmodule Islands.GameSupervisor do
 
-"""
+@moduledoc """
 alias Islands.{Game, GameSupervisor}
 {:ok, g} = GameSupervisor.start_game("Col")
 via = Game.via_tuple("Col")

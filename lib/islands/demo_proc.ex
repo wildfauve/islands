@@ -10,7 +10,7 @@ Process.exit(l, :boom)
 Process.alive?(l)
 
 receive do
-  msg -> "Message: "
+  m -> "Message: #{}"
   after 100 -> "nothing going on"
 end
 
